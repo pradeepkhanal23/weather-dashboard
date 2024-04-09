@@ -6,6 +6,7 @@
 
 :root {
   --font-family: "Poppins", sans-serif;
+  --gradient-color: linear-gradient(to right, #6441a5, #2a0845);
 }
 
 html {
@@ -17,4 +18,11 @@ body {
   min-height: 100vh;
   width: 100%;
   font-family: var(--font-family);
+}
+
+header {
+  background-image: var(--gradient-color);
+  color: white;
+  text-align: center;
+  padding: 1rem;
 }
