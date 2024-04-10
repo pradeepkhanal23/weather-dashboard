@@ -2,9 +2,18 @@
 const searchBtn = document.getElementById("search-btn");
 const cityInputEl = document.getElementById("city");
 const resultsEl = document.getElementById("results");
+const loader = document.querySelector(".loader");
 
 const apiKey = "af8e238d022ae49cfd547eb3a1338d5a";
 const baseURL = "https://api.openweathermap.org/data/2.5";
+
+function showLoader() {
+  loader.classList.add("show");
+}
+
+function hideLoader() {
+  loader.classList.remove("show");
+}
 
 async function success(pos) {
   const coordinates = pos.coords;
@@ -21,6 +30,8 @@ async function success(pos) {
 
   const currentLocation = await currentWeatherResponse.json();
   const currentForecast = await currentForecastResponse.json();
+
+  hideLoader();
 
   createWeatherCard(currentLocation, currentForecast.list);
 }
@@ -86,6 +97,7 @@ function createWeatherCard(current, forecastsArray) {
 
 //fetch weather data function
 async function fetchAPIEndpoint(city) {
+  showLoader();
   const weatherResponse = await fetch(
     `${baseURL}/weather?q=${city}&appid=${apiKey}`
   );
@@ -95,6 +107,7 @@ async function fetchAPIEndpoint(city) {
   const weatherData = await weatherResponse.json();
   const forecastData = await forecastResponse.json();
 
+  hideLoader();
   createWeatherCard(weatherData, forecastData.list);
 }
 
@@ -119,6 +132,7 @@ function eventHandlers() {
 
 function init() {
   eventHandlers();
+  showLoader();
 }
 
 init();
