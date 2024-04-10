@@ -44,6 +44,12 @@ form label {
   color: white;
 }
 
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .card-body h2 {
   font-weight: 900;
 }
