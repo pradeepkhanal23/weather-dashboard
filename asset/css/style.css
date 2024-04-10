@@ -39,6 +39,11 @@ form label {
   font-weight: 900;
 }
 
+.btn {
+  background-image: var(--gradient-color);
+  color: white;
+}
+
 .card-body h2 {
   font-weight: 900;
 }
@@ -53,12 +58,6 @@ form label {
 
 .forecast-title {
   font-weight: 800;
-}
-.btn {
-  width: 100%;
-  background-image: var(--gradient-color);
-  color: white;
-  border: none;
 }
 
 .forecast-cards {
@@ -89,8 +88,8 @@ form label {
     flex: 1 0 30%;
   }
 }
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 1250px) {
   .forecast-card {
-    flex: 1 0 15%;
+    flex: 1 0 18%;
   }
 }
