@@ -28,7 +28,7 @@ header {
   background-image: var(--gradient-color);
   color: white;
   text-align: center;
-  padding: 1rem 0rem;
+  padding: 0.5rem 0rem;
 }
 
 header h1 {
@@ -39,6 +39,21 @@ form label {
   font-weight: 900;
 }
 
+.card-body h2 {
+  font-weight: 900;
+}
+
+.card-text {
+  font-weight: 600;
+}
+
+.card-text span {
+  font-weight: 800;
+}
+
+.forecast-title {
+  font-weight: 800;
+}
 .btn {
   width: 100%;
   background-image: var(--gradient-color);
