@@ -3,6 +3,38 @@ const searchBtn = document.getElementById("search-btn");
 const cityInputEl = document.getElementById("city");
 const resultsEl = document.getElementById("results");
 
+const apiKey = "af8e238d022ae49cfd547eb3a1338d5a";
+const baseURL = "https://api.openweathermap.org/data/2.5";
+
+async function success(pos) {
+  const coordinates = pos.coords;
+
+  let lat = coordinates.latitude;
+  let lon = coordinates.longitude;
+
+  const currentWeatherResponse = await fetch(
+    `${baseURL}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+  );
+  const currentForecastResponse = await fetch(
+    `${baseURL}/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
+  );
+
+  const currentLocation = await currentWeatherResponse.json();
+  const currentForecast = await currentForecastResponse.json();
+
+  createWeatherCard(currentLocation, currentForecast.list);
+}
+
+function error(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
+function locationHandler() {
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+
+window.addEventListener("DOMContentLoaded", locationHandler);
+
 function createWeatherCard(current, forecastsArray) {
   // Generating HTML for current weather
   const currentWeatherHTML = `
@@ -54,9 +86,6 @@ function createWeatherCard(current, forecastsArray) {
 
 //fetch weather data function
 async function fetchAPIEndpoint(city) {
-  const apiKey = "af8e238d022ae49cfd547eb3a1338d5a";
-  const baseURL = "https://api.openweathermap.org/data/2.5";
-
   const weatherResponse = await fetch(
     `${baseURL}/weather?q=${city}&appid=${apiKey}`
   );
