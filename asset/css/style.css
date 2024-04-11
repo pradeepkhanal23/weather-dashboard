@@ -22,7 +22,6 @@ body {
   width: 100%;
   font-family: var(--font-family);
   font-size: 120%;
-  position: relative;
 }
 
 header {
@@ -38,23 +37,6 @@ header h1 {
 
 form label {
   font-weight: 900;
-}
-
-.loader.show {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.57);
-}
-
-.loader img {
-  height: 100%;
-  width: 100%;
-  opacity: 0.9;
 }
 
 .btn {

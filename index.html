@@ -31,7 +31,8 @@
     </header>
     <main class="container-fluid">
       <section class="row">
-        <div class="col-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="search">
+        <!-- Form and Search History section -->
+        <aside class="col-12 col-md-4 col-lg-3 col-xl-3 col-xxl-2" id="search">
           <div class="card mt-3">
             <div class="card-body">
               <form>
@@ -41,7 +42,7 @@
                     type="text"
                     class="form-control"
                     id="city"
-                    placeholder="London"
+                    placeholder="Enter City Name"
                   />
                 </div>
                 <div class="text-center">
@@ -58,105 +59,23 @@
           </div>
           <hr / class="my-4 border-black border-1">
           <div class="list-group" id="search-cities">
-            <button class="list-group-item list-group-item-action text-center">
+            <!-- <button class="list-group-item list-group-item-action text-center">
               Atlanta
-            </button>
-            <button class="list-group-item list-group-item-action text-center">
-              Denver
-            </button>
-            <button class="list-group-item list-group-item-action text-center">
-              Seattle
-            </button>
+            </button> -->
           </div>
-        </div>
-        <div
+        </aside>
+        <section
           class="col-12 col-md-8 mt-3 col-lg-9 col-xl-9 col-xxl-10"
           id="results"
         >
-          <section class="card" id="selected-city">
-            <div class="card-body">
-              <h2 class="card-title pb-2">
-                Atlanta <span class="date">(9/13/2022)</span>
-                <img
-                  src="https://openweathermap.org/img/wn/02d.png"
-                  alt="weather-icon"
-                />
-              </h2>
-              <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-              <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-              <p class="card-text"><span>Humidity:</span> 44%</p>
-            </div>
-          </section>
-          <section class="mt-5 d-flex flex-column" id="5-day-forecast">
-            <h3 class="forecast-title">5-Day Forecasts</h3>
-            <div class="forecast-cards">
-              <article class="card mb-2 forecast-card">
-                <div class="card-body">
-                  <p class="card-text">9/14/2022</p>
-                  <img
-                    src="https://openweathermap.org/img/wn/02d.png"
-                    alt="weather-icon"
-                  />
-                  <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-                  <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-                  <p class="card-text"><span>Humidity:</span> 44%</p>
-                </div>
-              </article>
-              <article class="card mb-2 forecast-card">
-                <div class="card-body">
-                  <p class="card-text">9/14/2022</p>
-                  <img
-                    src="https://openweathermap.org/img/wn/02d.png"
-                    alt="weather-icon"
-                  />
-                  <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-                  <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-                  <p class="card-text"><span>Humidity:</span> 44%</p>
-                </div>
-              </article>
-              <article class="card mb-2 forecast-card">
-                <div class="card-body">
-                  <p class="card-text">9/14/2022</p>
-                  <img
-                    src="https://openweathermap.org/img/wn/02d.png"
-                    alt="weather-icon"
-                  />
-                  <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-                  <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-                  <p class="card-text"><span>Humidity:</span> 44%</p>
-                </div>
-              </article>
-              <article class="card mb-2 forecast-card">
-                <div class="card-body">
-                  <p class="card-text">9/14/2022</p>
-                  <img
-                    src="https://openweathermap.org/img/wn/02d.png"
-                    alt="weather-icon"
-                  />
-                  <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-                  <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-                  <p class="card-text"><span>Humidity:</span> 44%</p>
-                </div>
-              </article>
-              <article class="card mb-2 forecast-card">
-                <div class="card-body">
-                  <p class="card-text">9/14/2022</p>
-                  <img
-                    src="https://openweathermap.org/img/wn/02d.png"
-                    alt="weather-icon"
-                  />
-                  <p class="card-text"><span>Temp:</span> 76.62 "F</p>
-                  <p class="card-text"><span>Wind:</span> 8.43 MPH</p>
-                  <p class="card-text"><span>Humidity:</span> 44%</p>
-                </div>
-              </article>
-            </div>
-          </section>
-        </div>
+          <h2>Loading Weather Information...</h2>
+
+          <!-- Main upper weather card with current weather  -->
+          <div id="current-weather"></div>
+          <!-- 5 days forecast section -->
+          <div id="forecast-weather"></div>
+        </section>
       </section>
-      <div class="loader">
-        <img src="./asset/images/loader.svg" alt="" />
-      </div>
     </main>
 
     <script

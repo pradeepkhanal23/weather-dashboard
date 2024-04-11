@@ -3,53 +3,20 @@ const searchBtn = document.getElementById("search-btn");
 const cityInputEl = document.getElementById("city");
 const resultsEl = document.getElementById("results");
 const loader = document.querySelector(".loader");
+const searchHistory = document.getElementById("search-cities");
+
+let cities = JSON.parse(localStorage.getItem("cities"));
+
+const currentWeatherEl = document.getElementById("current-weather");
+const forecastWeatherEl = document.getElementById("forecast-weather");
 
 const apiKey = "af8e238d022ae49cfd547eb3a1338d5a";
 const baseURL = "https://api.openweathermap.org/data/2.5";
 
-function showLoader() {
-  loader.classList.add("show");
-}
-
-function hideLoader() {
-  loader.classList.remove("show");
-}
-
-async function success(pos) {
-  const coordinates = pos.coords;
-
-  let lat = coordinates.latitude;
-  let lon = coordinates.longitude;
-
-  const currentWeatherResponse = await fetch(
-    `${baseURL}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
-  );
-  const currentForecastResponse = await fetch(
-    `${baseURL}/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
-  );
-
-  const currentLocation = await currentWeatherResponse.json();
-  const currentForecast = await currentForecastResponse.json();
-
-  hideLoader();
-
-  createWeatherCard(currentLocation, currentForecast.list);
-}
-
-function error(err) {
-  console.warn(`ERROR(${err.code}): ${err.message}`);
-}
-
-function locationHandler() {
-  navigator.geolocation.getCurrentPosition(success, error);
-}
-
-window.addEventListener("DOMContentLoaded", locationHandler);
-
 function createWeatherCard(current, forecastsArray) {
   // Generating HTML for current weather
-  const currentWeatherHTML = `
-    <section class="card" id="selected-city">
+  let weatherHTML = `
+    <article class="card" id="selected-city">
       <div class="card-body">
         <h2 class="card-title pb-2">${current.name} <span class="date">(9/13/2022)</span>
           <img src="https://openweathermap.org/img/wn/${current.weather[0].icon}.png" alt="weather-icon"/>
@@ -58,14 +25,15 @@ function createWeatherCard(current, forecastsArray) {
         <p class="card-text"><span>Wind:</span> ${current.wind.speed} MPH</p>
         <p class="card-text"><span>Humidity:</span> ${current.main.humidity}%</p>
       </div>
-    </section>
+    </article>
   `;
 
-  // Generating HTML for 5-day forecast
+  // Looping through forecastArray to generate forecast cards
+
   let forecastHTML = `
     <section class="mt-5 d-flex flex-column" id="5-day-forecast">
-      <h3 class="forecast-title">5-Day Forecasts</h3>
-      <div class="forecast-cards">
+              <h3 class="forecast-title">5 day forecast</h3>
+              <div class="forecast-cards">
   `;
 
   // Looping through forecastArray to generate forecast cards
@@ -91,48 +59,128 @@ function createWeatherCard(current, forecastsArray) {
     </section>
   `;
 
-  // Combining current weather and forecast HTML and displaying it in resultsEl
-  resultsEl.innerHTML = currentWeatherHTML + forecastHTML;
+  resultsEl.innerHTML = weatherHTML + forecastHTML;
 }
 
 //fetch weather data function
 async function fetchAPIEndpoint(city) {
-  showLoader();
-  const weatherResponse = await fetch(
-    `${baseURL}/weather?q=${city}&appid=${apiKey}`
-  );
-  const forecastResponse = await fetch(
-    `${baseURL}/forecast?q=${city}&appid=${apiKey}`
-  );
-  const weatherData = await weatherResponse.json();
-  const forecastData = await forecastResponse.json();
+  try {
+    const weatherResponse = await fetch(
+      `${baseURL}/weather?q=${city}&appid=${apiKey}`
+    );
+    const forecastResponse = await fetch(
+      `${baseURL}/forecast?q=${city}&appid=${apiKey}`
+    );
+    const weatherData = await weatherResponse.json();
+    const forecastData = await forecastResponse.json();
 
-  hideLoader();
-  createWeatherCard(weatherData, forecastData.list);
+    createWeatherCard(weatherData, forecastData.list);
+  } catch (error) {
+    alert("The city name doesnt exists,Please enter a valid city name");
+  }
+}
+
+function createButtonCard(city) {
+  let capitalizedValue = city.charAt(0).toUpperCase() + city.slice(1);
+
+  const button = document.createElement("button");
+  button.classList.add("list-group-item");
+  button.classList.add("list-group-item-action");
+  button.classList.add("text-center");
+  button.textContent = capitalizedValue;
+
+  return button;
 }
 
 //submit handle function
 function handleSubmit(event) {
   event.preventDefault();
 
-  const city = cityInputEl.value;
-
   if (!city) {
     alert("Please enter the city name");
   } else {
+    //getting input value
+    const city = cityInputEl.value;
+
+    //we initialize and empty array if there is nothing in local storage
+    if (cities === null) {
+      cities = [];
+    }
+
+    //we then push the new entered city value to the cities array and store it again in the local storage
+    cities.push(city);
+    localStorage.setItem("cities", JSON.stringify(cities));
+
+    //now creating a card button for that city value
+    let cityButtonCard = createButtonCard(city);
+
+    //appending that button card in the search history element
+    searchHistory.append(cityButtonCard);
+
+    //after that we start our fetching
     fetchAPIEndpoint(city);
-    city.value = "";
+    cityInputEl.value = "";
+  }
+}
+
+async function success(pos) {
+  const coordinates = pos.coords;
+
+  let lat = coordinates.latitude;
+  let lon = coordinates.longitude;
+
+  const parseWeatherData = fetchWeatherDataFromStorage();
+  if (parseWeatherData) {
+    createWeatherCard(parseWeatherData.weather, parseWeatherData.forecast);
+  }
+
+  const currentWeatherResponse = await fetch(
+    `${baseURL}/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`
+  );
+  const currentForecastResponse = await fetch(
+    `${baseURL}/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`
+  );
+
+  const currentLocation = await currentWeatherResponse.json();
+  const currentForecast = await currentForecastResponse.json();
+
+  localStorage.setItem(
+    "weatherData",
+    JSON.stringify({
+      weather: currentLocation,
+      forecast: currentForecast.list,
+    })
+  );
+
+  createWeatherCard(currentLocation, currentForecast.list);
+}
+
+function error(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
+function locationHandler() {
+  navigator.geolocation.getCurrentPosition(success, error);
+}
+
+function fetchWeatherDataFromStorage() {
+  let weatherData = JSON.parse(localStorage.getItem("weatherData"));
+  return weatherData;
+}
+
+function fetchSearchHistoryFromStorage() {
+  if (cities) {
+    for (const city of cities) {
+      const buttonCard = createButtonCard(city);
+      searchHistory.append(buttonCard);
+    }
+  } else {
+    return [];
   }
 }
 
 //event handles called here
-function eventHandlers() {
-  searchBtn.addEventListener("click", handleSubmit);
-}
-
-function init() {
-  eventHandlers();
-  showLoader();
-}
-
-init();
+searchBtn.addEventListener("click", handleSubmit);
+locationHandler();
+fetchWeatherDataFromStorage();
+fetchSearchHistoryFromStorage();
