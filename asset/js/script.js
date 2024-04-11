@@ -64,26 +64,33 @@ function createWeatherCard(current, forecastsArray) {
   resultsEl.innerHTML = weatherHTML + forecastHTML;
 }
 
+function isArrayFull(arr) {
+  if (arr.length >= 11) {
+    return true;
+  } else if (arr.length === null) {
+    return false;
+  } else {
+    return false;
+  }
+}
+
 function addToLocalStorage(city) {
   //we initialize and empty array if there is nothing in local storage
   if (cities === null) {
     cities = [];
   }
-
   //we then push the new entered city value to the cities array and store it again in the local storage
   cities.unshift(city);
-  localStorage.setItem("cities", JSON.stringify(cities));
-}
 
-function getFromLocalStorage() {
-  if (cities) {
-    for (city of cities) {
-      const buttonCard = createButtonCard(city);
-      searchHistory.append(buttonCard);
-    }
-  } else {
-    return [];
+  const full = isArrayFull(cities);
+
+  if (full) {
+    cities.pop();
+    localStorage.setItem("cities", JSON.stringify(cities));
+    return;
   }
+
+  localStorage.setItem("cities", JSON.stringify(cities));
 }
 
 //fetch weather data function
@@ -116,6 +123,18 @@ function createButtonCard(city) {
   button.textContent = capitalizedValue;
 
   return button;
+}
+
+function updateCityList() {
+  if (!cities) {
+    return [];
+  } else {
+    searchHistory.innerHTML = "";
+    let cities = JSON.parse(localStorage.getItem("cities"));
+    cities.forEach((city) => {
+      searchHistory.append(createButtonCard(city));
+    });
+  }
 }
 
 function handleSearch(event) {
@@ -175,6 +194,8 @@ async function handleSubmit(event) {
     //after that we start our fetching
     fetchAPIEndpoint(city);
     cityInputEl.value = "";
+
+    updateCityList();
   }
 }
 
@@ -226,6 +247,6 @@ function fetchWeatherDataFromStorage() {
 //event handles called here
 searchBtn.addEventListener("click", handleSubmit);
 searchHistory.addEventListener("click", handleSearch);
+updateCityList();
 locationHandler();
 fetchWeatherDataFromStorage();
-getFromLocalStorage();
