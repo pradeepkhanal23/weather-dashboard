@@ -4,8 +4,10 @@ const cityInputEl = document.getElementById("city");
 const resultsEl = document.getElementById("results");
 const loader = document.querySelector(".loader");
 const searchHistory = document.getElementById("search-cities");
+const message = document.querySelector(".message");
 
 let cities = JSON.parse(localStorage.getItem("cities"));
+let activeButton = null;
 
 const currentWeatherEl = document.getElementById("current-weather");
 const forecastWeatherEl = document.getElementById("forecast-weather");
@@ -62,21 +64,45 @@ function createWeatherCard(current, forecastsArray) {
   resultsEl.innerHTML = weatherHTML + forecastHTML;
 }
 
+function addToLocalStorage(city) {
+  //we initialize and empty array if there is nothing in local storage
+  if (cities === null) {
+    cities = [];
+  }
+
+  //we then push the new entered city value to the cities array and store it again in the local storage
+  cities.unshift(city);
+  localStorage.setItem("cities", JSON.stringify(cities));
+}
+
+function getFromLocalStorage() {
+  if (cities) {
+    for (city of cities) {
+      const buttonCard = createButtonCard(city);
+      searchHistory.append(buttonCard);
+    }
+  } else {
+    return [];
+  }
+}
+
 //fetch weather data function
 async function fetchAPIEndpoint(city) {
-  try {
-    const weatherResponse = await fetch(
-      `${baseURL}/weather?q=${city}&appid=${apiKey}`
-    );
-    const forecastResponse = await fetch(
-      `${baseURL}/forecast?q=${city}&appid=${apiKey}`
-    );
+  const weatherResponse = await fetch(
+    `${baseURL}/weather?q=${city}&appid=${apiKey}`
+  );
+  const forecastResponse = await fetch(
+    `${baseURL}/forecast?q=${city}&appid=${apiKey}`
+  );
+
+  // Check if the weather API request was successful
+  if (weatherResponse.ok && forecastResponse.ok) {
     const weatherData = await weatherResponse.json();
     const forecastData = await forecastResponse.json();
-
     createWeatherCard(weatherData, forecastData.list);
-  } catch (error) {
-    alert("The city name doesnt exists,Please enter a valid city name");
+  } else {
+    message.textContent = `City '${city}' cannot be found, please enter a valid city name`;
+    console.log(weatherResponse.error());
   }
 }
 
@@ -92,24 +118,53 @@ function createButtonCard(city) {
   return button;
 }
 
-//submit handle function
-function handleSubmit(event) {
+function handleSearch(event) {
   event.preventDefault();
+
+  if (event.target.classList.contains("list-group-item")) {
+    if (activeButton) {
+      activeButton.classList.remove("active");
+    }
+
+    event.target.classList.add("active");
+
+    activeButton = event.target;
+
+    fetchAPIEndpoint(event.target.textContent);
+  }
+}
+
+async function validateCity(city) {
+  try {
+    const response = await fetch(
+      `${baseURL}/weather?q=${city}&appid=${apiKey}`
+    );
+    return response.ok;
+  } catch (error) {
+    console.error("Error validating city:", error);
+    return false;
+  }
+}
+
+//submit handle function
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  const city = cityInputEl.value.trim();
 
   if (!city) {
     alert("Please enter the city name");
+    return;
   } else {
-    //getting input value
-    const city = cityInputEl.value;
+    const isValidCity = await validateCity(city);
 
-    //we initialize and empty array if there is nothing in local storage
-    if (cities === null) {
-      cities = [];
+    if (!isValidCity) {
+      message.textContent = `Invalid city name '${city}'. Please enter a valid city name`;
+      cityInputEl.value = "";
+      return;
     }
 
-    //we then push the new entered city value to the cities array and store it again in the local storage
-    cities.push(city);
-    localStorage.setItem("cities", JSON.stringify(cities));
+    addToLocalStorage(city);
 
     //now creating a card button for that city value
     let cityButtonCard = createButtonCard(city);
@@ -168,19 +223,9 @@ function fetchWeatherDataFromStorage() {
   return weatherData;
 }
 
-function fetchSearchHistoryFromStorage() {
-  if (cities) {
-    for (const city of cities) {
-      const buttonCard = createButtonCard(city);
-      searchHistory.append(buttonCard);
-    }
-  } else {
-    return [];
-  }
-}
-
 //event handles called here
 searchBtn.addEventListener("click", handleSubmit);
+searchHistory.addEventListener("click", handleSearch);
 locationHandler();
 fetchWeatherDataFromStorage();
-fetchSearchHistoryFromStorage();
+getFromLocalStorage();

@@ -43,6 +43,7 @@
                     class="form-control"
                     id="city"
                     placeholder="Enter City Name"
+                    required
                   />
                 </div>
                 <div class="text-center">
@@ -58,17 +59,13 @@
             </div>
           </div>
           <hr / class="my-4 border-black border-1">
-          <div class="list-group" id="search-cities">
-            <!-- <button class="list-group-item list-group-item-action text-center">
-              Atlanta
-            </button> -->
-          </div>
+          <div class="list-group" id="search-cities"></div>
         </aside>
         <section
           class="col-12 col-md-8 mt-3 col-lg-9 col-xl-9 col-xxl-10"
           id="results"
         >
-          <h2>Loading Weather Information...</h2>
+          <p class="message">Loading Weather Information...</p>
 
           <!-- Main upper weather card with current weather  -->
           <div id="current-weather"></div>
