@@ -15,15 +15,24 @@ const forecastWeatherEl = document.getElementById("forecast-weather");
 const apiKey = "af8e238d022ae49cfd547eb3a1338d5a";
 const baseURL = "https://api.openweathermap.org/data/2.5";
 
+let today = new Date();
+let now = {
+  year: today.getFullYear(),
+  month: today.getMonth() + 1, //because the month is 0 index, we added 1 to make it in order
+  day: today.getDate(),
+};
+
+const formattedDate = `${now.day}/${now.month}/${now.year}`;
+
 function createWeatherCard(current, forecastsArray) {
   // Generating HTML for current weather
   let weatherHTML = `
-    <article class="card" id="selected-city">
+    <article class="card border border-2" id="selected-city">
       <div class="card-body">
-        <h2 class="card-title pb-2">${current.name} <span class="date">(9/13/2022)</span>
+        <h2 class="card-title pb-2">${current.name} <span class="date">${formattedDate}</span>
           <img src="https://openweathermap.org/img/wn/${current.weather[0].icon}.png" alt="weather-icon"/>
         </h2>
-        <p class="card-text"><span>Temp:</span> ${current.main.temp} F</p>
+        <p class="card-text"><span>Temp:</span> ${current.main.temp}°F</p>
         <p class="card-text"><span>Wind:</span> ${current.wind.speed} MPH</p>
         <p class="card-text"><span>Humidity:</span> ${current.main.humidity}%</p>
       </div>
@@ -34,7 +43,7 @@ function createWeatherCard(current, forecastsArray) {
 
   let forecastHTML = `
     <section class="mt-5 d-flex flex-column" id="5-day-forecast">
-              <h3 class="forecast-title">5 day forecast</h3>
+              <h3 class="forecast-title">5 days forecast:</h3>
               <div class="forecast-cards">
   `;
 
@@ -42,12 +51,20 @@ function createWeatherCard(current, forecastsArray) {
   for (let i = 0; i < 5; i++) {
     const forecast = forecastsArray[i];
 
+    now = {
+      year: today.getFullYear(),
+      month: today.getMonth() + 1, //because the month is 0 index, we added 1 to make it in order
+      day: today.getDate() + i + 1, // the array is 0 based so so we added 1 to make it start from 1
+    };
+
+    const formattedForecastDate = `${now.day}/${now.month}/${now.year}`;
+
     forecastHTML += `
       <article class="card mb-2 forecast-card">
         <div class="card-body">
-          <p class="card-text">10/12/2024</p>
+          <p class="card-text">${formattedForecastDate}</p>
             <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="weather-icon"/>
-          <p class="card-text"><span>Temp:</span> ${forecast.main.temp} F</p>
+          <p class="card-text"><span>Temp:</span> ${forecast.main.temp}°F</p>
           <p class="card-text"><span>Wind:</span> ${forecast.wind.speed} MPH</p>
           <p class="card-text"><span>Humidity:</span> ${forecast.main.humidity}%</p>
         </div>
@@ -65,7 +82,7 @@ function createWeatherCard(current, forecastsArray) {
 }
 
 function isArrayFull(arr) {
-  if (arr.length >= 11) {
+  if (arr.length >= 12) {
     return true;
   } else if (arr.length === null) {
     return false;
@@ -125,12 +142,13 @@ function createButtonCard(city) {
   return button;
 }
 
-function updateCityList() {
+function renderSearchHistory() {
   if (!cities) {
     return [];
   } else {
     searchHistory.innerHTML = "";
     let cities = JSON.parse(localStorage.getItem("cities"));
+    cities = new Set(cities);
     cities.forEach((city) => {
       searchHistory.append(createButtonCard(city));
     });
@@ -142,10 +160,10 @@ function handleSearch(event) {
 
   if (event.target.classList.contains("list-group-item")) {
     if (activeButton) {
-      activeButton.classList.remove("active");
+      activeButton.classList.remove("current");
     }
 
-    event.target.classList.add("active");
+    event.target.classList.add("current");
 
     activeButton = event.target;
 
@@ -195,7 +213,7 @@ async function handleSubmit(event) {
     fetchAPIEndpoint(city);
     cityInputEl.value = "";
 
-    updateCityList();
+    renderSearchHistory();
   }
 }
 
@@ -247,6 +265,6 @@ function fetchWeatherDataFromStorage() {
 //event handles called here
 searchBtn.addEventListener("click", handleSubmit);
 searchHistory.addEventListener("click", handleSearch);
-updateCityList();
+renderSearchHistory();
 locationHandler();
 fetchWeatherDataFromStorage();

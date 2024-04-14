@@ -66,6 +66,11 @@ form label {
   font-weight: 800;
 }
 
+.list-group-item.current {
+  background-image: var(--gradient-color);
+  color: white;
+}
+
 .forecast-cards {
   display: flex;
   flex-direction: column;
